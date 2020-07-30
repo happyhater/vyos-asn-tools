@@ -1,0 +1,97 @@
+<% unless defined?(ipv4).nil? -%>
+delete protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> description "<%= name %> IPv4 (AS<%= @asn %>) via <%= ipv4["interface"] %>"
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> remote-as <%= @asn %>
+<% unless ipv4["password"].nil? -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> password <%= ipv4["password"] %>
+<% end -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> address-family ipv4-unicast route-map import import4-AS<%= @asn %>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> address-family ipv4-unicast route-map export export4-AS<%= @asn %>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> address-family ipv4-unicast soft-reconfiguration inbound
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> update-source <%= ipv4["local-ip"] %>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> address-family ipv4-unicast remove-private-as
+<% unless ipv4["maximum-prefix"].nil? -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> address-family ipv4-unicast maximum-prefix <%= ipv4["maximum-prefix"] %>
+<% end -%>
+<% unless ipv4["interval"].nil? -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> advertisement-interval <%= ipv4["interval"] %>
+<% end -%>
+<% unless ipv4["multihop"].nil? -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv4["remote-ip"] %> ebgp-multihop <%= ipv4["multihop"] %>
+<% end -%>
+delete policy route-map import4-AS<%= @asn %>
+delete policy route-map export4-AS<%= @asn %>
+delete policy prefix-list nexthop4-AS<%= @asn %>
+set policy prefix-list nexthop4-AS<%= @asn %> rule 1 action permit
+set policy prefix-list nexthop4-AS<%= @asn %> rule 1 prefix <%= ipv4["remote-ip"] %>/32
+set policy route-map import4-AS<%= @asn %> description "<%= name %> IPv4 IMPORT"
+set policy route-map import4-AS<%= @asn %> rule 1 action deny
+set policy route-map import4-AS<%= @asn %> rule 1 match ip address prefix-list prefix4-<%= ipv4["export"] %>
+set policy route-map import4-AS<%= @asn %> rule 2 action permit
+set policy route-map import4-AS<%= @asn %> rule 2 match ip address prefix-list prefix4-<%= ipv4["import"].sub(":", "--") %>
+set policy route-map import4-AS<%= @asn %> rule 2 match as-path path-AS<%= @asn %>
+set policy route-map import4-AS<%= @asn %> rule 2 match ip nexthop prefix-list nexthop4-AS<%= @asn %>
+set policy route-map import4-AS<%= @asn %> rule 2 set community "<%= @ouras %>:<%= community %>"
+<% unless ipv4["local-preference"].nil? -%>
+set policy route-map import4-AS<%= @asn %> rule 2 set local-preference <%= ipv4["local-preference"] %>
+<% end -%>
+set policy prefix-list prefix4-<%= ipv4["import"].sub(":", "--") %>
+set policy route-map export4-AS<%= @asn %> description "<%= name %> IPv6 EXPORT"
+set policy route-map export4-AS<%= @asn %> rule 1 action deny
+set policy route-map export4-AS<%= @asn %> rule 1 match as-path path-AS<%= @asn %>
+set policy route-map export4-AS<%= @asn %> rule 2 action permit
+set policy route-map export4-AS<%= @asn %> rule 2 match ip address prefix-list prefix4-<%= ipv4["export"] %>
+<%  unless defined?(community_out).nil? -%>
+set policy route-map export4-AS<%= @asn %> rule 2 set community <%= community_out %>
+<% end -%>
+set policy prefix-list prefix4-<%= ipv4["export"] %>
+<% end -%>
+<% unless defined?(ipv6).nil? -%>
+
+delete protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> description "<%= name %> IPv6 (AS<%= @asn %>) via <%= ipv6["interface"] %>"
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> remote-as <%= @asn %>
+<% unless ipv6["password"].nil? -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> password <%= ipv6["password"] %>
+<% end -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> address-family ipv6-unicast route-map import import6-AS<%= @asn %>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> address-family ipv6-unicast route-map export export6-AS<%= @asn %>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> address-family ipv6-unicast soft-reconfiguration inbound
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> update-source <%= ipv6["local-ip"] %>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> address-family ipv6-unicast remove-private-as
+<% unless ipv6["maximum-prefix"].nil? -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> address-family ipv6-unicast maximum-prefix <%= ipv6["maximum-prefix"] %>
+<% end -%>
+<% unless ipv6["interval"].nil? -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> advertisement-interval <%= ipv6["interval"] %>
+<% end -%>
+<% unless ipv6["multihop"].nil? -%>
+set protocols bgp <%= @ouras %> neighbor <%= ipv6["remote-ip"] %> ebgp-multihop <%= ipv6["multihop"] %>
+<% end -%>
+delete policy route-map import6-AS<%= @asn %>
+delete policy route-map export6-AS<%= @asn %>
+set policy route-map import6-AS<%= @asn %> description "<%= name %> IPv6 IMPORT"
+set policy route-map import6-AS<%= @asn %> rule 1 action deny
+set policy route-map import6-AS<%= @asn %> rule 1 match ipv6 address prefix-list prefix6-<%= ipv6["export"] %>
+set policy route-map import6-AS<%= @asn %> rule 2 action permit
+set policy route-map import6-AS<%= @asn %> rule 2 match ipv6 address prefix-list prefix6-<%= ipv6["import"].sub(":", "--") %>
+set policy route-map import6-AS<%= @asn %> rule 2 match as-path path-AS<%= @asn %>
+set policy route-map import6-AS<%= @asn %> rule 2 match ipv6 nexthop <%= ipv6["remote-ip"] %>
+set policy route-map import6-AS<%= @asn %> rule 2 set community "<%= @ouras %>:<%= community %>"
+<% unless ipv6["local-preference"].nil? -%>
+set policy route-map import6-AS<%= @asn %> rule 2 set local-preference <%= ipv6["local-preference"] %>
+<% end -%>
+set policy prefix-list6 prefix6-<%= ipv6["import"] %>
+set policy route-map export6-AS<%= @asn %> description "<%= name %> IPv6 EXPORT"
+set policy route-map export6-AS<%= @asn %> rule 1 action deny
+set policy route-map export6-AS<%= @asn %> rule 1 match as-path path-AS<%= @asn %>
+set policy route-map export6-AS<%= @asn %> rule 2 action permit
+set policy route-map export6-AS<%= @asn %> rule 2 match ipv6 address prefix-list prefix6-<%= ipv6["export"] %>
+<%  unless defined?(community_out).nil? -%>
+set policy route-map export6-AS<%= @asn %> rule 2 set community <%= community_out %>
+<% end -%>
+set policy prefix-list6 prefix6-<%= ipv6["export"].sub(":", "--") %>
+<% end -%> 
+delete policy as-path-list path-AS<%= @asn %>
+set policy as-path-list path-AS<%= @asn %> rule 1 action permit
+set policy as-path-list path-AS<%= @asn %> rule 1 regex "^<%= @asn %>_"

@@ -1,0 +1,42 @@
+---
+config:
+  ouras: 51999
+router:
+  rtr1:
+    model: vyatta
+    upstream:
+      12345:
+        name: WHITEHAT
+        community: 1001
+        ipv4:
+          import: ANY
+          export: AS-WHITEHAT
+          local-ip: 1.2.3.4
+          remote-ip: 1.2.3.5
+          password: changem
+          interface: WH
+        ipv6:
+          import: ANY
+          export: AS-WHITEHAT
+          local-ip: 2000:1234::1
+          remote-ip: 2000:1234::2
+          password: changeme
+          interface: WH
+    downstream:
+      210323:
+        community: 3001
+        name: WhiteHat 1 Limited
+        ipv4:
+          import: ANY
+          export: AS-WHITEHAT
+          local-ip: 10.10.10.1
+          remote-ip: 10.10.10.2
+          interface: WH
+          maximum-prefix: 10
+        ipv6:
+          import: ANY
+          export: AS-WHITEHAT
+          local-ip: 2000:1234::1
+          remote-ip: 2000:1234::2
+          interface: WH
+          maximum-prefix: 10
