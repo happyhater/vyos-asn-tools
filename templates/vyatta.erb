@@ -31,16 +31,19 @@ set policy route-map import4-AS<%= @asn %> rule 2 action permit
 set policy route-map import4-AS<%= @asn %> rule 2 match ip address prefix-list prefix4-<%= ipv4["import"].sub(":", "--") %>
 set policy route-map import4-AS<%= @asn %> rule 2 match as-path path-AS<%= @asn %>
 set policy route-map import4-AS<%= @asn %> rule 2 match ip nexthop prefix-list nexthop4-AS<%= @asn %>
+set policy route-map import4-AS<%= @asn %> rule 2 match rpki valid
 set policy route-map import4-AS<%= @asn %> rule 2 set community "<%= @ouras %>:<%= community %>"
 <% unless ipv4["local-preference"].nil? -%>
 set policy route-map import4-AS<%= @asn %> rule 2 set local-preference <%= ipv4["local-preference"] %>
 <% end -%>
+set policy route-map import4-AS<%= @asn %> rule 65535 action deny
 set policy prefix-list prefix4-<%= ipv4["import"].sub(":", "--") %>
 set policy route-map export4-AS<%= @asn %> description "<%= name %> IPv6 EXPORT"
 set policy route-map export4-AS<%= @asn %> rule 1 action deny
 set policy route-map export4-AS<%= @asn %> rule 1 match as-path path-AS<%= @asn %>
 set policy route-map export4-AS<%= @asn %> rule 2 action permit
 set policy route-map export4-AS<%= @asn %> rule 2 match ip address prefix-list prefix4-<%= ipv4["export"] %>
+set policy route-map export4-AS<%= @asn %> rule 2 match rpki valid
 <%  unless defined?(community_out).nil? -%>
 set policy route-map export4-AS<%= @asn %> rule 2 set community <%= community_out %>
 <% end -%>
@@ -77,16 +80,19 @@ set policy route-map import6-AS<%= @asn %> rule 2 action permit
 set policy route-map import6-AS<%= @asn %> rule 2 match ipv6 address prefix-list prefix6-<%= ipv6["import"].sub(":", "--") %>
 set policy route-map import6-AS<%= @asn %> rule 2 match as-path path-AS<%= @asn %>
 set policy route-map import6-AS<%= @asn %> rule 2 match ipv6 nexthop <%= ipv6["remote-ip"] %>
+set policy route-map import6-AS<%= @asn %> rule 2 match rpki valid
 set policy route-map import6-AS<%= @asn %> rule 2 set community "<%= @ouras %>:<%= community %>"
 <% unless ipv6["local-preference"].nil? -%>
 set policy route-map import6-AS<%= @asn %> rule 2 set local-preference <%= ipv6["local-preference"] %>
 <% end -%>
+set policy route-map import6-AS<%= @asn %> rule 65535 action deny
 set policy prefix-list6 prefix6-<%= ipv6["import"] %>
 set policy route-map export6-AS<%= @asn %> description "<%= name %> IPv6 EXPORT"
 set policy route-map export6-AS<%= @asn %> rule 1 action deny
 set policy route-map export6-AS<%= @asn %> rule 1 match as-path path-AS<%= @asn %>
 set policy route-map export6-AS<%= @asn %> rule 2 action permit
 set policy route-map export6-AS<%= @asn %> rule 2 match ipv6 address prefix-list prefix6-<%= ipv6["export"] %>
+set policy route-map export6-AS<%= @asn %> rule 2 match rpki valid
 <%  unless defined?(community_out).nil? -%>
 set policy route-map export6-AS<%= @asn %> rule 2 set community <%= community_out %>
 <% end -%>
